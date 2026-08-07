@@ -1,6 +1,7 @@
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { AgGridReact } from '@ag-grid-community/react';
-import { ColDef, CellValueChangedEvent } from '@ag-grid-community/core';
+import { ModuleRegistry, ColDef } from '@ag-grid-community/core';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { useProjectStore } from '../store/useProjectStore';
 import { useBuildStore } from '../store/useBuildStore';
 import { Plus, Trash2, FileSpreadsheet, PlusCircle, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
@@ -8,12 +9,16 @@ import { Plus, Trash2, FileSpreadsheet, PlusCircle, CheckCircle2, AlertCircle, C
 import '@ag-grid-community/styles/ag-grid.css';
 import '@ag-grid-community/styles/ag-theme-alpine.css';
 
+// Register AG-Community Modules
+ModuleRegistry.registerModules([ClientSideRowModelModule]);
+
 export const GridEditor: React.FC = () => {
   const { columns, rows, addRow, addColumn, updateRowCell, toggleRowEnabled, deleteRows } = useProjectStore();
   const { rowStates } = useBuildStore();
   const [newColName, setNewColName] = useState('');
   const [newColKey, setNewColKey] = useState('');
   const [showAddCol, setShowAddCol] = useState(false);
+  const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
 
   // Transform store dynamic columns into AG-Grid ColDef array
   const columnDefs = useMemo<ColDef[]>(() => {
@@ -75,14 +80,23 @@ export const GridEditor: React.FC = () => {
 
     const dynamicCols: ColDef[] = columns.map((col) => ({
       headerName: `${col.headerName} ({{${col.key}}})`,
-      field: `values.${col.key}`,
+      field: col.key,
       editable: true,
       filter: 'agTextColumnFilter',
       flex: 1,
       minWidth: 160,
-      valueGetter: (params) => params.data?.values?.[col.key] || '',
+      valueGetter: (params) => {
+        if (!params.data || !params.data.values) return '';
+        const val = params.data.values[col.key];
+        if (val !== undefined) return val;
+        // Fallback case-insensitive key lookup
+        const lowerKey = col.key.toLowerCase();
+        const foundKey = Object.keys(params.data.values).find((k) => k.toLowerCase() === lowerKey);
+        return foundKey ? params.data.values[foundKey] : '';
+      },
       valueSetter: (params) => {
-        updateRowCell(params.data.id, col.key, params.newValue);
+        if (!params.data) return false;
+        updateRowCell(params.data.id, col.key, params.newValue || '');
         return true;
       },
     }));

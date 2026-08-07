@@ -10,6 +10,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@ag-grid-community/client-side-row-model": "^31.3.2",
     "@ag-grid-community/core": "^31.3.2",
     "@ag-grid-community/react": "^31.3.2",
     "@ag-grid-community/styles": "^31.3.2",
