@@ -1,6 +1,15 @@
 import { invoke } from '@tauri-apps/api/core';
 import { ProjectConfig, CompilerSettings, BuildResult, BatchSummary } from '../types';
 
+export async function autoLoadAiproj(): Promise<ProjectConfig | null> {
+  try {
+    return await invoke<ProjectConfig | null>('auto_load_aiproj');
+  } catch (err) {
+    console.warn('Auto-load .aiproj check skipped (web preview or non-Tauri mode).', err);
+    return null;
+  }
+}
+
 export async function detectAut2exePath(): Promise<string> {
   try {
     return await invoke<string>('detect_aut2exe_path');

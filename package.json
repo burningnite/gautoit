@@ -12,6 +12,7 @@
   "dependencies": {
     "@ag-grid-community/core": "^31.3.2",
     "@ag-grid-community/react": "^31.3.2",
+    "@ag-grid-community/styles": "^31.3.2",
     "@codemirror/lang-cpp": "^6.0.2",
     "@tauri-apps/api": "^2.0.0",
     "@tauri-apps/plugin-dialog": "^2.0.0",

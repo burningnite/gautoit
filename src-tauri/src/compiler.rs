@@ -50,8 +50,8 @@ pub async fn execute_aut2exe_compilation(
         cmd.arg("/x64");
     }
 
-    // Compression switch
-    cmd.arg(format!("/comp {}", settings.compression_level));
+    // Compression switch (passed as separate switch and value to prevent Aut2exe GUI popup)
+    cmd.arg("/comp").arg(settings.compression_level.to_string());
 
     // Console switch
     if settings.is_console_app {

@@ -28,6 +28,7 @@ interface ProjectState {
   deleteRows: (rowIds: string[]) => void;
   
   // Bulk persistence & loading
+  resetProject: () => void;
   loadProject: (config: ProjectConfig) => void;
   getProjectConfig: () => ProjectConfig;
 }
@@ -125,14 +126,22 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
       rows: state.rows.filter((row) => !rowIds.includes(row.id)),
     })),
 
+  resetProject: () =>
+    set({
+      projectName: 'New AutoIt Batch Project',
+      templateCode: '',
+      columns: [],
+      rows: [],
+    }),
+
   loadProject: (config) =>
     set({
-      projectName: config.projectName,
-      templateCode: config.templateCode,
-      columns: config.columns,
-      rows: config.rows,
-      outputDir: config.outputDir,
-      namingPattern: config.namingPattern,
+      projectName: config.projectName || 'AutoIt Batch Project',
+      templateCode: config.templateCode || '',
+      columns: config.columns || [],
+      rows: config.rows || [],
+      outputDir: config.outputDir || 'C:\\AutoItBuilds\\Output',
+      namingPattern: config.namingPattern || 'Build_{{ id }}.exe',
     }),
 
   getProjectConfig: () => {

@@ -11,6 +11,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .invoke_handler(tauri::generate_handler![
+            commands::auto_load_aiproj,
             commands::detect_aut2exe_path,
             commands::compile_batch,
             commands::save_project_file,

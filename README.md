@@ -11,10 +11,13 @@ An **Executable Factory & Batch Compilation System** built using **Tauri v2 (Rus
 
 ## 📑 Master Specifications & Documentation
 
-1. 📘 [tauri_autoit_factory_plan.md](file:///c:/Users/juanc/Desktop/gautoit/tauri_autoit_factory_plan.md) — Master Architecture & Implementation Plan
-2. 📘 [windows_environment_setup_guide.md](file:///c:/Users/juanc/Desktop/gautoit/windows_environment_setup_guide.md) — Windows Workstation Toolchain & Environment Setup Guide
-3. 📕 [aut2exe_batch_compiler_spec.md](file:///c:/Users/juanc/Desktop/gautoit/aut2exe_batch_compiler_spec.md) — Rust Backend Batch Compiler Engine Specification
-4. 📗 [ag_grid_template_integration_guide.md](file:///c:/Users/juanc/Desktop/gautoit/ag_grid_template_integration_guide.md) — React AG-Grid Spreadsheet & CodeMirror Integration Guide
+1. 📖 [USER_GUIDE.md](file:///c:/Users/juanc/Desktop/gautoit/USER_GUIDE.md) — Comprehensive Human User Manual & Operating Guide
+2. 🚀 [PORTABLE_COMPILER_ARCHITECTURE.md](file:///c:/Users/juanc/Desktop/gautoit/PORTABLE_COMPILER_ARCHITECTURE.md) — Zero-Config Portable Architecture & Toolchain Auto-Extraction Spec
+3. 🤖 [LLM_COMPLETION_GUIDELINE.md](file:///c:/Users/juanc/Desktop/gautoit/LLM_COMPLETION_GUIDELINE.md) — Step-by-Step Technical Blueprint & Standard for AI Agents / LLMs
+4. 📘 [tauri_autoit_factory_plan.md](file:///c:/Users/juanc/Desktop/gautoit/tauri_autoit_factory_plan.md) — Master Architecture & Implementation Plan
+5. 📘 [windows_environment_setup_guide.md](file:///c:/Users/juanc/Desktop/gautoit/windows_environment_setup_guide.md) — Windows Workstation Toolchain & Environment Setup Guide
+6. 📕 [aut2exe_batch_compiler_spec.md](file:///c:/Users/juanc/Desktop/gautoit/aut2exe_batch_compiler_spec.md) — Rust Backend Batch Compiler Engine Specification
+7. 📗 [ag_grid_template_integration_guide.md](file:///c:/Users/juanc/Desktop/gautoit/ag_grid_template_integration_guide.md) — React AG-Grid Spreadsheet & CodeMirror Integration Guide
 
 ---
 

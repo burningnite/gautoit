@@ -35,36 +35,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
         {/* Modal Body */}
         <div className="space-y-4 text-xs">
-          {/* Aut2exe Path */}
-          <div className="space-y-1.5">
-            <label className="block text-slate-300 font-semibold flex justify-between">
-              <span>Aut2exe Compiler Binary Path (.exe)</span>
-              <button
-                type="button"
-                onClick={handleAutoDetect}
-                className="text-blue-400 hover:underline flex items-center space-x-1"
-              >
-                <Search className="w-3 h-3" />
-                <span>Auto-Detect Path</span>
-              </button>
-            </label>
-            <input
-              type="text"
-              value={compilerSettings.aut2exePath}
-              onChange={(e) => setCompilerSettings({ aut2exePath: e.target.value })}
-              className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-blue-500"
-            />
-          </div>
-
-          {/* Output Folder */}
-          <div className="space-y-1.5">
-            <label className="block text-slate-300 font-semibold">Output Directory Path</label>
-            <input
-              type="text"
-              value={outputDir}
-              onChange={(e) => setOutputDir(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700 rounded px-3 py-2 text-slate-100 font-mono focus:outline-none focus:border-blue-500"
-            />
+          {/* Zero-Config Portable Badges */}
+          <div className="p-3 bg-slate-950 border border-slate-800 rounded-lg space-y-2 text-slate-300">
+            <div className="flex justify-between items-center">
+              <span className="font-semibold text-slate-200">🚀 Embedded Toolchain:</span>
+              <span className="font-mono text-emerald-400">./tmp/aut2exe/ (Auto-Extracted)</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="font-semibold text-slate-200">📁 Output Directory:</span>
+              <span className="font-mono text-blue-400">./outputs/ (Relative to .exe)</span>
+            </div>
           </div>
 
           {/* Output Naming Pattern */}

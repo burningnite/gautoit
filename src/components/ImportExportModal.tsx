@@ -8,7 +8,7 @@ interface ImportExportModalProps {
 }
 
 export const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, onClose }) => {
-  const { getProjectConfig, loadProject } = useProjectStore();
+  const { getProjectConfig, loadProject, resetProject } = useProjectStore();
   const [jsonText, setJsonText] = useState('');
   const [copied, setCopied] = useState(false);
 
@@ -26,6 +26,7 @@ export const ImportExportModal: React.FC<ImportExportModalProps> = ({ isOpen, on
         alert('Invalid project structure! Missing required columns or rows.');
         return;
       }
+      resetProject();
       loadProject(parsed);
       alert('Project configuration loaded successfully!');
       onClose();
