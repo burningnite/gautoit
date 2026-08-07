@@ -79,7 +79,7 @@ export const GridEditor: React.FC = () => {
     ];
 
     const dynamicCols: ColDef[] = columns.map((col) => ({
-      headerName: `${col.headerName} ({{${col.key}}})`,
+      headerName: col.headerName,
       field: col.key,
       editable: true,
       filter: 'agTextColumnFilter',
