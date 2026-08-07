@@ -17,11 +17,28 @@ import {
   Layers
 } from 'lucide-react';
 
+import { autoSaveAiproj } from '../utils/tauriCommands';
+
 export const HeaderNav: React.FC = () => {
   const { projectName, setProjectName, getProjectConfig, compilerSettings } = useProjectStore();
   const { isBuilding, initBatch, setActiveTab, activeTab, addLog, setSummary } = useBuildStore();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isImportExportOpen, setIsImportExportOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleQuickSave = async () => {
+    setIsSaving(true);
+    try {
+      const savedPath = await autoSaveAiproj(getProjectConfig());
+      if (savedPath) {
+        addLog('success', `💾 Project auto-saved back to disk: ${savedPath}`);
+      }
+    } catch (err: any) {
+      addLog('error', `Failed saving project: ${err?.message || err}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const handleStartCompile = async () => {
     const config = getProjectConfig();
@@ -115,6 +132,16 @@ export const HeaderNav: React.FC = () => {
 
         {/* Right section: Action Buttons & Compile Launcher */}
         <div className="flex items-center space-x-3">
+          <button
+            onClick={handleQuickSave}
+            disabled={isSaving}
+            className="flex items-center space-x-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 px-3 py-1.5 rounded-lg text-xs font-medium transition"
+            title="Save project back to local .aiproj file"
+          >
+            <Save className="w-4 h-4 text-emerald-400" />
+            <span>{isSaving ? 'Saving...' : 'Save .aiproj'}</span>
+          </button>
+
           <button
             onClick={() => setIsImportExportOpen(true)}
             className="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition border border-slate-700"

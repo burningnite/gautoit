@@ -10,6 +10,15 @@ export async function autoLoadAiproj(): Promise<ProjectConfig | null> {
   }
 }
 
+export async function autoSaveAiproj(config: ProjectConfig): Promise<string | null> {
+  try {
+    return await invoke<string>('auto_save_aiproj', { config });
+  } catch (err) {
+    console.warn('Auto-save .aiproj skipped.', err);
+    return null;
+  }
+}
+
 export async function detectAut2exePath(): Promise<string> {
   try {
     return await invoke<string>('detect_aut2exe_path');

@@ -31,6 +31,29 @@ pub fn auto_load_aiproj() -> Result<Option<ProjectConfig>, String> {
 }
 
 #[tauri::command]
+pub fn auto_save_aiproj(config: ProjectConfig) -> Result<String, String> {
+    let base_dir = std::env::current_exe()
+        .ok()
+        .and_then(|p| p.parent().map(|p| p.to_path_buf()))
+        .unwrap_or_else(|| std::env::current_dir().unwrap_or_default());
+
+    let mut save_path = None;
+    if let Ok(entries) = std::fs::read_dir(&base_dir) {
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("aiproj") {
+                save_path = Some(path);
+                break;
+            }
+        }
+    }
+
+    let target_file = save_path.unwrap_or_else(|| base_dir.join("project.aiproj"));
+    file_manager::save_project_file(&target_file.to_string_lossy(), &config)?;
+    Ok(target_file.to_string_lossy().to_string())
+}
+
+#[tauri::command]
 pub fn detect_aut2exe_path(app_handle: tauri::AppHandle) -> String {
     let base_dir = std::env::current_exe()
         .ok()
