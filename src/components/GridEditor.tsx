@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef, useCallback } from 'react';
 import { AgGridReact } from '@ag-grid-community/react';
-import { ModuleRegistry, ColDef } from '@ag-grid-community/core';
+import { ModuleRegistry, ColDef, GetRowIdParams, CellValueChangedEvent } from '@ag-grid-community/core';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { useProjectStore } from '../store/useProjectStore';
 import { useBuildStore } from '../store/useBuildStore';
@@ -20,7 +20,17 @@ export const GridEditor: React.FC = () => {
   const [showAddCol, setShowAddCol] = useState(false);
   const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
 
+  // Keep refs to latest store functions so columnDefs don't need to depend on them
+  const toggleRowEnabledRef = useRef(toggleRowEnabled);
+  toggleRowEnabledRef.current = toggleRowEnabled;
+  const updateRowCellRef = useRef(updateRowCell);
+  updateRowCellRef.current = updateRowCell;
+
+  // Stable getRowId so AG-Grid can track rows by identity across re-renders
+  const getRowId = useCallback((params: GetRowIdParams) => params.data.id, []);
+
   // Transform store dynamic columns into AG-Grid ColDef array
+  // Only depends on columns (schema) and rowStates (build status), NOT on store mutators
   const columnDefs = useMemo<ColDef[]>(() => {
     const baseCols: ColDef[] = [
       {
@@ -33,7 +43,7 @@ export const GridEditor: React.FC = () => {
             <input
               type="checkbox"
               checked={params.value}
-              onChange={(e) => toggleRowEnabled(params.data.id, e.target.checked)}
+              onChange={(e) => toggleRowEnabledRef.current(params.data.id, e.target.checked)}
               className="rounded bg-slate-900 border-slate-700 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
             />
           </div>
@@ -96,13 +106,21 @@ export const GridEditor: React.FC = () => {
       },
       valueSetter: (params) => {
         if (!params.data) return false;
-        updateRowCell(params.data.id, col.key, params.newValue || '');
+        params.data.values[col.key] = params.newValue || '';
+        updateRowCellRef.current(params.data.id, col.key, params.newValue || '');
         return true;
       },
     }));
 
+
     return [...baseCols, ...dynamicCols];
-  }, [columns, rowStates, toggleRowEnabled, updateRowCell]);
+  }, [columns, rowStates]);
+
+  // Handle cell edits via grid event instead of inline valueSetter — avoids columnDefs churn
+  const onCellValueChanged = useCallback((event: CellValueChangedEvent) => {
+    if (!event.data || !event.colDef.field) return;
+    updateRowCellRef.current(event.data.id, event.colDef.field, event.newValue || '');
+  }, []);
 
   const handleAddColumnSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -196,12 +214,14 @@ export const GridEditor: React.FC = () => {
         <AgGridReact
           rowData={rows}
           columnDefs={columnDefs}
+          getRowId={getRowId}
+          onCellValueChanged={onCellValueChanged}
           defaultColDef={{
             sortable: true,
             resizable: true,
             filter: true,
           }}
-          animateRows={true}
+          maintainColumnOrder={true}
           rowSelection="multiple"
         />
       </div>
