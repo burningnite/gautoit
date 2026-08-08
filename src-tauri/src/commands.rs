@@ -120,40 +120,51 @@ pub async fn compile_batch(
     let semaphore = Arc::new(Semaphore::new(max_parallel));
     let mut tasks = Vec::new();
 
+    let blocks = template_engine.parse_blocks(&project_config.template_code);
     let enabled_rows: Vec<_> = project_config.rows.into_iter().filter(|r| r.enabled).collect();
-    let _ = app_handle.emit("batch-started", serde_json::json!({ "total_rows": enabled_rows.len() }));
+    let total_tasks = enabled_rows.len() * blocks.len();
+    let _ = app_handle.emit("batch-started", serde_json::json!({ "total_rows": enabled_rows.len(), "total_tasks": total_tasks }));
 
     for row in enabled_rows {
-        // 1. Render master template script
-        let rendered_script = template_engine.render_script(&project_config.template_code, &row.values)?;
+        for (block_idx, block) in blocks.iter().enumerate() {
+            // 1. Render block script template
+            let rendered_script = template_engine.render_script(&block.template_code, &row.values)?;
 
-        // 2. Compute destination file path in ./outputs directory
-        let filename = template_engine.generate_output_filename(
-            &project_config.naming_pattern,
-            &row.values,
-            &row.id,
-        );
+            // 2. Compute destination file path using block filename pattern override or default naming pattern
+            let pattern = block.filename_pattern.as_deref().unwrap_or(&project_config.naming_pattern);
+            let filename = template_engine.generate_output_filename(
+                pattern,
+                &row.values,
+                &row.id,
+            );
 
-        let output_exe_path = outputs_dir.join(filename).to_string_lossy().to_string();
+            let output_exe_path = outputs_dir.join(&filename).to_string_lossy().to_string();
 
-        let build_task = BuildTask {
-            row_id: row.id.clone(),
-            rendered_au3_code: rendered_script,
-            output_exe_path,
-        };
+            let task_row_id = if blocks.len() > 1 {
+                format!("{}_b{}", row.id, block_idx + 1)
+            } else {
+                row.id.clone()
+            };
 
-        let sem_clone = Arc::clone(&semaphore);
-        let settings_clone = compiler_settings.clone();
-        let session_temp_clone = session_temp_dir.clone();
-        let app_handle_clone = app_handle.clone();
+            let build_task = BuildTask {
+                row_id: task_row_id,
+                rendered_au3_code: rendered_script,
+                output_exe_path,
+            };
 
-        tasks.push(tokio::spawn(async move {
-            let _permit = sem_clone.acquire().await.unwrap();
-            let _ = app_handle_clone.emit("row-build-started", RowStartedPayload { row_id: build_task.row_id.clone() });
-            let result = execute_aut2exe_compilation(&build_task, &settings_clone, &session_temp_clone).await;
-            let _ = app_handle_clone.emit("row-build-completed", result.clone());
-            result
-        }));
+            let sem_clone = Arc::clone(&semaphore);
+            let settings_clone = compiler_settings.clone();
+            let session_temp_clone = session_temp_dir.clone();
+            let app_handle_clone = app_handle.clone();
+
+            tasks.push(tokio::spawn(async move {
+                let _permit = sem_clone.acquire().await.unwrap();
+                let _ = app_handle_clone.emit("row-build-started", RowStartedPayload { row_id: build_task.row_id.clone() });
+                let result = execute_aut2exe_compilation(&build_task, &settings_clone, &session_temp_clone).await;
+                let _ = app_handle_clone.emit("row-build-completed", result.clone());
+                result
+            }));
+        }
     }
 
     let mut total_success = 0;
