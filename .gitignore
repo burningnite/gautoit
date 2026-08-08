@@ -25,3 +25,9 @@ src-tauri/target/
 # Temporary build artifacts
 *.tmp
 temp_*.au3
+
+# Private data, scripts & project files containing credentials
+script-guide/
+ea-scripts/
+*.aiproj
+*.csv
