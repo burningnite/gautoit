@@ -19,6 +19,7 @@ handlebars = "4.5"
 tokio = { version = "1.35", features = ["full"] }
 csv = "1.3"
 uuid = { version = "1.6", features = ["v4", "serde"] }
+include_dir = "0.7"
 
 [features]
 default = ["custom-protocol"]

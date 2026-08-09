@@ -13,7 +13,7 @@ import '@ag-grid-community/styles/ag-theme-alpine.css';
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
 export const GridEditor: React.FC = () => {
-  const { columns, rows, addRow, addColumn, updateRowCell, toggleRowEnabled, deleteRows } = useProjectStore();
+  const { columns, rows, addRow, addColumn, updateRowCell, toggleRowEnabled, deleteRows, reorderColumns } = useProjectStore();
   const { rowStates } = useBuildStore();
   const [newColName, setNewColName] = useState('');
   const [newColKey, setNewColKey] = useState('');
@@ -25,6 +25,8 @@ export const GridEditor: React.FC = () => {
   toggleRowEnabledRef.current = toggleRowEnabled;
   const updateRowCellRef = useRef(updateRowCell);
   updateRowCellRef.current = updateRowCell;
+  const reorderColumnsRef = useRef(reorderColumns);
+  reorderColumnsRef.current = reorderColumns;
 
   // Stable getRowId so AG-Grid can track rows by identity across re-renders
   const getRowId = useCallback((params: GetRowIdParams) => params.data.id, []);
@@ -122,6 +124,23 @@ export const GridEditor: React.FC = () => {
     updateRowCellRef.current(event.data.id, event.colDef.field, event.newValue || '');
   }, []);
 
+  // Handle column reordering via grid event
+  const onColumnMoved = useCallback((event: any) => {
+    const colState = event.api.getColumnState();
+    const orderedKeys = colState
+      .map((col: any) => col.colId)
+      .filter((colId: any) => colId !== 'enabled' && colId !== 'id');
+
+    const currentKeys = columns.map((c) => c.key);
+    const isDifferent =
+      orderedKeys.length === currentKeys.length &&
+      orderedKeys.some((val: string, index: number) => val !== currentKeys[index]);
+
+    if (isDifferent) {
+      reorderColumnsRef.current(orderedKeys);
+    }
+  }, [columns]);
+
   const handleAddColumnSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newColName || !newColKey) return;
@@ -216,6 +235,7 @@ export const GridEditor: React.FC = () => {
           columnDefs={columnDefs}
           getRowId={getRowId}
           onCellValueChanged={onCellValueChanged}
+          onColumnMoved={onColumnMoved}
           defaultColDef={{
             sortable: true,
             resizable: true,

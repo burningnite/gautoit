@@ -25,6 +25,9 @@ src-tauri/target/
 # Temporary build artifacts
 *.tmp
 temp_*.au3
+test-chamber/
+tmp/
+outputs/
 
 # Private data, scripts & project files containing credentials
 script-guide/

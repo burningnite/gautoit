@@ -20,6 +20,7 @@ interface ProjectState {
   // Column actions
   addColumn: (column: ColumnDef) => void;
   removeColumn: (columnId: string) => void;
+  reorderColumns: (orderedKeys: string[]) => void;
   
   // Row actions
   addRow: () => void;
@@ -89,6 +90,23 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     set((state) => ({
       columns: state.columns.filter((c) => c.id !== colId),
     })),
+
+  reorderColumns: (orderedKeys) =>
+    set((state) => {
+      const colMap = new Map(state.columns.map((c) => [c.key, c]));
+      const newCols: ColumnDef[] = [];
+      orderedKeys.forEach((key) => {
+        const col = colMap.get(key);
+        if (col) {
+          newCols.push(col);
+          colMap.delete(key);
+        }
+      });
+      colMap.forEach((col) => {
+        newCols.push(col);
+      });
+      return { columns: newCols };
+    }),
 
   addRow: () =>
     set((state) => {
