@@ -76,12 +76,14 @@ impl TemplateEngine {
     }
 
     pub fn render_script(&self, template: &str, row_values: &HashMap<String, String>) -> Result<String, String> {
-        self.hb.render_template(template, row_values)
+        let map = normalize_map(row_values);
+        self.hb.render_template(template, &map)
             .map_err(|e| format!("Template render error: {}", e))
     }
 
     pub fn generate_output_filename(&self, pattern: &str, row_values: &HashMap<String, String>, default_id: &str) -> String {
-        match self.hb.render_template(pattern, row_values) {
+        let map = normalize_map(row_values);
+        match self.hb.render_template(pattern, &map) {
             Ok(name) => {
                 let sanitized = name.replace(|c: char| !c.is_alphanumeric() && c != '_' && c != '-' && c != '.', "_");
                 if sanitized.ends_with(".exe") {
@@ -93,4 +95,19 @@ impl TemplateEngine {
             Err(_) => format!("output_{}.exe", default_id),
         }
     }
+}
+
+fn normalize_map(row_values: &HashMap<String, String>) -> HashMap<String, String> {
+    let mut normalized = row_values.clone();
+    for (k, v) in row_values {
+        let lower = k.to_lowercase();
+        if !normalized.contains_key(&lower) {
+            normalized.insert(lower.clone(), v.clone());
+        }
+        let upper = k.to_uppercase();
+        if !normalized.contains_key(&upper) {
+            normalized.insert(upper, v.clone());
+        }
+    }
+    normalized
 }
