@@ -1,20 +1,20 @@
 import { invoke } from '@tauri-apps/api/core';
-import { ProjectConfig, CompilerSettings, BuildResult, BatchSummary } from '../types';
+import { FardoConfig, CompilerSettings, BuildResult, BatchSummary } from '../types';
 
-export async function autoLoadAiproj(): Promise<ProjectConfig | null> {
+export async function autoLoadFardo(): Promise<FardoConfig | null> {
   try {
-    return await invoke<ProjectConfig | null>('auto_load_aiproj');
+    return await invoke<FardoConfig | null>('auto_load_fardo');
   } catch (err) {
-    console.warn('Auto-load .aiproj check skipped (web preview or non-Tauri mode).', err);
+    console.warn('Auto-load .fardo check skipped (web preview or non-Tauri mode).', err);
     return null;
   }
 }
 
-export async function autoSaveAiproj(config: ProjectConfig): Promise<string | null> {
+export async function autoSaveFardo(config: FardoConfig): Promise<string | null> {
   try {
-    return await invoke<string>('auto_save_aiproj', { config });
+    return await invoke<string>('auto_save_fardo', { config });
   } catch (err) {
-    console.warn('Auto-save .aiproj skipped.', err);
+    console.warn('Auto-save .fardo skipped.', err);
     return null;
   }
 }
@@ -29,12 +29,12 @@ export async function detectAut2exePath(): Promise<string> {
 }
 
 export async function compileBatch(
-  projectConfig: ProjectConfig,
+  fardoConfig: FardoConfig,
   compilerSettings: CompilerSettings
 ): Promise<BatchSummary> {
   try {
     return await invoke<BatchSummary>('compile_batch', {
-      projectConfig,
+      fardoConfig,
       compilerSettings,
     });
   } catch (err) {
@@ -43,20 +43,20 @@ export async function compileBatch(
   }
 }
 
-export async function saveProject(filePath: string, config: ProjectConfig): Promise<void> {
+export async function saveFardo(filePath: string, config: FardoConfig): Promise<void> {
   try {
-    await invoke('save_project_file', { filePath, config });
+    await invoke('save_fardo_file', { filePath, config });
   } catch (err) {
-    console.error('Save project failed:', err);
+    console.error('Save fardo failed:', err);
     throw err;
   }
 }
 
-export async function loadProject(filePath: string): Promise<ProjectConfig> {
+export async function loadFardo(filePath: string): Promise<FardoConfig> {
   try {
-    return await invoke<ProjectConfig>('load_project_file', { filePath });
+    return await invoke<FardoConfig>('load_fardo_file', { filePath });
   } catch (err) {
-    console.error('Load project failed:', err);
+    console.error('Load fardo failed:', err);
     throw err;
   }
 }

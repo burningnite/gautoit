@@ -11,12 +11,12 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .invoke_handler(tauri::generate_handler![
-            commands::auto_load_aiproj,
-            commands::auto_save_aiproj,
+            commands::auto_load_fardo,
+            commands::auto_save_fardo,
             commands::detect_aut2exe_path,
             commands::compile_batch,
-            commands::save_project_file,
-            commands::load_project_file,
+            commands::save_fardo_file,
+            commands::load_fardo_file,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

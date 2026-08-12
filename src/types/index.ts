@@ -1,25 +1,33 @@
-export interface ColumnDef {
-  id: string;          // e.g. "col_pc_name", "col_exe_path"
-  headerName: string;  // e.g. "Target PC", "Executable Path"
-  key: string;         // Placeholder key used in template: e.g. "PC_NAME"
-  type: 'text' | 'number' | 'boolean' | 'filepath';
-  defaultValue?: string;
+export interface PlatformAccount {
+  user: string;
+  password?: string;
 }
 
-export interface RowData {
-  id: string;                         // Unique UUID for the row
-  enabled: boolean;                   // Toggle to include/exclude row from batch compile
-  values: Record<string, string>;     // Key-value map: { "PC_NAME": "SERVER-01", "EXE_PATH": "C:\\app.exe" }
+export interface PlatformConfig {
+  launcher: string;
+  gameBasePath: string;
+  gameExt: string;
+  games: string[];
+  templateCode: string;
 }
 
-export interface ProjectConfig {
+export interface FardoPC {
+  id: string;
+  enabled: boolean;
+  shortwait: number;
+  prepasswait: number;
+  accounts: Record<string, PlatformAccount>; // e.g., 'epic': { user: '...' }
+  disabledGames: string[]; // games that this PC should not compile for
+}
+
+export interface FardoConfig {
   version: string;
   projectName: string;
-  templateCode: string;               // AutoIt script with {{PLACEHOLDERS}}
-  columns: ColumnDef[];
-  rows: RowData[];
   outputDir: string;
-  namingPattern: string;              // e.g. "Build_{{PC_NAME}}_{{EXE_NAME}}.exe"
+  namingPattern: string;
+  timerBasePath: string;
+  platforms: Record<string, PlatformConfig>;
+  pcs: FardoPC[];
 }
 
 export interface CompilerSettings {

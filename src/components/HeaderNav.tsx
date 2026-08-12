@@ -3,7 +3,7 @@ import { useProjectStore } from '../store/useProjectStore';
 import { useBuildStore } from '../store/useBuildStore';
 import { compileBatch } from '../utils/tauriCommands';
 import { SettingsModal } from './SettingsModal';
-import { ImportExportModal } from './ImportExportModal';
+import { PlatformConfigModal } from './PlatformConfigModal';
 import { 
   Play, 
   FolderOpen, 
@@ -17,19 +17,19 @@ import {
   Layers
 } from 'lucide-react';
 
-import { autoSaveAiproj } from '../utils/tauriCommands';
+import { autoSaveFardo } from '../utils/tauriCommands';
 
 export const HeaderNav: React.FC = () => {
   const { projectName, setProjectName, getProjectConfig, compilerSettings } = useProjectStore();
   const { isBuilding, initBatch, setActiveTab, activeTab, addLog, setSummary } = useBuildStore();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isImportExportOpen, setIsImportExportOpen] = useState(false);
+  const [isPlatformsOpen, setIsPlatformsOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleQuickSave = async () => {
     setIsSaving(true);
     try {
-      const savedPath = await autoSaveAiproj(getProjectConfig());
+      const savedPath = await autoSaveFardo(getProjectConfig());
       if (savedPath) {
         addLog('success', `💾 Project auto-saved back to disk: ${savedPath}`);
       }
@@ -42,14 +42,14 @@ export const HeaderNav: React.FC = () => {
 
   const handleStartCompile = async () => {
     const config = getProjectConfig();
-    const enabledRows = config.rows.filter((r) => r.enabled);
+    const enabledPCs = config.pcs.filter((p) => p.enabled);
 
-    if (enabledRows.length === 0) {
-      alert('No rows selected/enabled for batch compilation!');
+    if (enabledPCs.length === 0) {
+      alert('No PCs enabled for batch compilation!');
       return;
     }
 
-    initBatch(enabledRows.map((r) => r.id));
+    initBatch(enabledPCs.map((p) => p.id));
     setActiveTab('logs');
 
     try {
@@ -72,7 +72,7 @@ export const HeaderNav: React.FC = () => {
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg text-white shadow-md">
             <Cpu className="w-6 h-6 animate-pulse" />
-            <span className="font-bold text-sm tracking-wider uppercase">AutoIt Factory</span>
+            <span className="font-bold text-sm tracking-wider uppercase">Taurito Factory</span>
           </div>
 
           <div className="h-6 w-px bg-slate-800" />
@@ -86,7 +86,7 @@ export const HeaderNav: React.FC = () => {
               placeholder="Project Name..."
             />
             <span className="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded border border-slate-700">
-              v1.0 Windows Native
+              v1.1 Windows Native
             </span>
           </div>
         </div>
@@ -102,19 +102,7 @@ export const HeaderNav: React.FC = () => {
             }`}
           >
             <Table className="w-4 h-4" />
-            <span>Data Grid</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('template')}
-            className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-xs font-medium transition ${
-              activeTab === 'template'
-                ? 'bg-blue-600 text-white shadow'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Code className="w-4 h-4" />
-            <span>Master Template</span>
+            <span>Tree Editor</span>
           </button>
 
           <button
@@ -139,16 +127,16 @@ export const HeaderNav: React.FC = () => {
             title="Save project back to local .aiproj file"
           >
             <Save className="w-4 h-4 text-emerald-400" />
-            <span>{isSaving ? 'Saving...' : 'Save .aiproj'}</span>
+            <span>{isSaving ? 'Saving...' : 'Save .fardo'}</span>
           </button>
 
           <button
-            onClick={() => setIsImportExportOpen(true)}
+            onClick={() => setIsPlatformsOpen(true)}
             className="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition border border-slate-700"
-            title="Import / Export Data"
+            title="Platform Configurations"
           >
-            <Download className="w-4 h-4 text-slate-400" />
-            <span>Import/Export</span>
+            <Layers className="w-4 h-4 text-slate-400" />
+            <span>Platforms</span>
           </button>
 
           <button
@@ -177,7 +165,7 @@ export const HeaderNav: React.FC = () => {
 
       {/* Modals */}
       <SettingsModal isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
-      <ImportExportModal isOpen={isImportExportOpen} onClose={() => setIsImportExportOpen(false)} />
+      <PlatformConfigModal isOpen={isPlatformsOpen} onClose={() => setIsPlatformsOpen(false)} />
     </>
   );
 };

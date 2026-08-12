@@ -36,6 +36,50 @@ pub struct ProjectConfig {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PlatformAccount {
+    pub user: String,
+    pub password: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PlatformConfig {
+    pub launcher: String,
+    #[serde(rename = "gameBasePath")]
+    pub game_base_path: String,
+    #[serde(rename = "gameExt")]
+    pub game_ext: String,
+    pub games: Vec<String>,
+    #[serde(rename = "templateCode")]
+    pub template_code: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct FardoPC {
+    pub id: String,
+    pub enabled: bool,
+    pub shortwait: f64,
+    pub prepasswait: f64,
+    pub accounts: HashMap<String, PlatformAccount>,
+    #[serde(rename = "disabledGames")]
+    pub disabled_games: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct FardoConfig {
+    pub version: String,
+    #[serde(rename = "projectName")]
+    pub project_name: String,
+    #[serde(rename = "outputDir")]
+    pub output_dir: String,
+    #[serde(rename = "namingPattern")]
+    pub naming_pattern: String,
+    #[serde(rename = "timerBasePath")]
+    pub timer_base_path: String,
+    pub platforms: HashMap<String, PlatformConfig>,
+    pub pcs: Vec<FardoPC>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CompilerSettings {
     #[serde(rename = "aut2exePath")]
     pub aut2exe_path: String,

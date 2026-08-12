@@ -1,6 +1,6 @@
 [package]
-name = "tauri-autoit-factory"
-version = "1.0.0"
+name = "taurito"
+version = "1.1.0"
 description = "Windows-Native Tauri AutoIt Executable Factory"
 authors = ["AutoIt Factory Developer"]
 edition = "2021"

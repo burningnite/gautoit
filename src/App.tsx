@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
 import { listen } from '@tauri-apps/api/event';
 import { HeaderNav } from './components/HeaderNav';
-import { GridEditor } from './components/GridEditor';
-import { TemplateEditor } from './components/TemplateEditor';
+import { TreeEditor } from './components/TreeEditor';
 import { CompilerConsole } from './components/CompilerConsole';
 import { useBuildStore } from './store/useBuildStore';
 import { useProjectStore } from './store/useProjectStore';
-import { autoLoadAiproj } from './utils/tauriCommands';
+import { autoLoadFardo } from './utils/tauriCommands';
 import { BuildResult, BatchSummary } from './types';
 
 export const App: React.FC = () => {
@@ -19,12 +18,12 @@ export const App: React.FC = () => {
     let unlistenFinished: (() => void) | undefined;
 
     const setupApp = async () => {
-      // 1. Auto-import any .aiproj file found in the execution directory
+      // 1. Auto-import any .fardo file found in the execution directory
       try {
-        const autoProject = await autoLoadAiproj();
+        const autoProject = await autoLoadFardo();
         if (autoProject) {
           loadProject(autoProject);
-          addLog('info', `📂 Automatically loaded project configuration from local .aiproj file: "${autoProject.projectName}"`);
+          addLog('info', `📂 Automatically loaded project configuration from local .fardo file: "${autoProject.projectName}"`);
         }
       } catch (err) {
         console.warn('Auto-import check skipped:', err);
@@ -68,15 +67,11 @@ export const App: React.FC = () => {
       <main className="flex-1 p-4 overflow-hidden relative">
         {activeTab === 'grid' && (
           <div className="h-full w-full">
-            <GridEditor />
+            <TreeEditor />
           </div>
         )}
 
-        {activeTab === 'template' && (
-          <div className="h-full w-full">
-            <TemplateEditor />
-          </div>
-        )}
+        {/* TemplateEditor is deprecated in favor of TreeEditor and Global config */}
 
         {activeTab === 'logs' && (
           <div className="h-full w-full">

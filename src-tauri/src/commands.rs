@@ -1,6 +1,6 @@
 use crate::compiler::execute_aut2exe_compilation;
 use crate::file_manager;
-use crate::models::{BatchSummary, BuildResult, BuildTask, CompilerSettings, ProjectConfig};
+use crate::models::{BatchSummary, BuildResult, BuildTask, CompilerSettings, FardoConfig};
 use crate::template_engine::TemplateEngine;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -10,7 +10,7 @@ use tokio::sync::Semaphore;
 use tauri::Manager;
 
 #[tauri::command]
-pub fn auto_load_aiproj() -> Result<Option<ProjectConfig>, String> {
+pub fn auto_load_fardo() -> Result<Option<FardoConfig>, String> {
     let base_dir = std::env::current_exe()
         .ok()
         .and_then(|p| p.parent().map(|p| p.to_path_buf()))
@@ -19,8 +19,8 @@ pub fn auto_load_aiproj() -> Result<Option<ProjectConfig>, String> {
     if let Ok(entries) = std::fs::read_dir(&base_dir) {
         for entry in entries.flatten() {
             let path = entry.path();
-            if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("aiproj") {
-                if let Ok(config) = file_manager::load_project_file(&path.to_string_lossy()) {
+            if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("fardo") {
+                if let Ok(config) = file_manager::load_fardo_file(&path.to_string_lossy()) {
                     return Ok(Some(config));
                 }
             }
@@ -31,7 +31,7 @@ pub fn auto_load_aiproj() -> Result<Option<ProjectConfig>, String> {
 }
 
 #[tauri::command]
-pub fn auto_save_aiproj(config: ProjectConfig) -> Result<String, String> {
+pub fn auto_save_fardo(config: FardoConfig) -> Result<String, String> {
     let base_dir = std::env::current_exe()
         .ok()
         .and_then(|p| p.parent().map(|p| p.to_path_buf()))
@@ -41,15 +41,15 @@ pub fn auto_save_aiproj(config: ProjectConfig) -> Result<String, String> {
     if let Ok(entries) = std::fs::read_dir(&base_dir) {
         for entry in entries.flatten() {
             let path = entry.path();
-            if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("aiproj") {
+            if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("fardo") {
                 save_path = Some(path);
                 break;
             }
         }
     }
 
-    let target_file = save_path.unwrap_or_else(|| base_dir.join("project.aiproj"));
-    file_manager::save_project_file(&target_file.to_string_lossy(), &config)?;
+    let target_file = save_path.unwrap_or_else(|| base_dir.join("project.fardo"));
+    file_manager::save_fardo_file(&target_file.to_string_lossy(), &config)?;
     Ok(target_file.to_string_lossy().to_string())
 }
 
@@ -78,7 +78,7 @@ pub struct RowStartedPayload {
 #[tauri::command]
 pub async fn compile_batch(
     app_handle: tauri::AppHandle,
-    project_config: ProjectConfig,
+    fardo_config: FardoConfig,
     mut compiler_settings: CompilerSettings,
 ) -> Result<BatchSummary, String> {
     let start_time = Instant::now();
@@ -120,51 +120,25 @@ pub async fn compile_batch(
     let semaphore = Arc::new(Semaphore::new(max_parallel));
     let mut tasks = Vec::new();
 
-    let blocks = template_engine.parse_blocks(&project_config.template_code);
-    let enabled_rows: Vec<_> = project_config.rows.into_iter().filter(|r| r.enabled).collect();
-    let total_tasks = enabled_rows.len() * blocks.len();
-    let _ = app_handle.emit("batch-started", serde_json::json!({ "total_rows": enabled_rows.len(), "total_tasks": total_tasks }));
+    let build_tasks = template_engine.expand_fardo(&fardo_config, &outputs_dir)?;
+    let total_tasks = build_tasks.len();
+    
+    // We can emit a total rows derived from the tasks or PCs for the frontend progress bar
+    let _ = app_handle.emit("batch-started", serde_json::json!({ "total_rows": total_tasks, "total_tasks": total_tasks }));
 
-    for row in enabled_rows {
-        for (block_idx, block) in blocks.iter().enumerate() {
-            // 1. Render block script template
-            let rendered_script = template_engine.render_script(&block.template_code, &row.values)?;
+    for build_task in build_tasks {
+        let sem_clone = Arc::clone(&semaphore);
+        let settings_clone = compiler_settings.clone();
+        let session_temp_clone = session_temp_dir.clone();
+        let app_handle_clone = app_handle.clone();
 
-            // 2. Compute destination file path using block filename pattern override or default naming pattern
-            let pattern = block.filename_pattern.as_deref().unwrap_or(&project_config.naming_pattern);
-            let filename = template_engine.generate_output_filename(
-                pattern,
-                &row.values,
-                &row.id,
-            );
-
-            let output_exe_path = outputs_dir.join(&filename).to_string_lossy().to_string();
-
-            let task_row_id = if blocks.len() > 1 {
-                format!("{}_b{}", row.id, block_idx + 1)
-            } else {
-                row.id.clone()
-            };
-
-            let build_task = BuildTask {
-                row_id: task_row_id,
-                rendered_au3_code: rendered_script,
-                output_exe_path,
-            };
-
-            let sem_clone = Arc::clone(&semaphore);
-            let settings_clone = compiler_settings.clone();
-            let session_temp_clone = session_temp_dir.clone();
-            let app_handle_clone = app_handle.clone();
-
-            tasks.push(tokio::spawn(async move {
-                let _permit = sem_clone.acquire().await.unwrap();
-                let _ = app_handle_clone.emit("row-build-started", RowStartedPayload { row_id: build_task.row_id.clone() });
-                let result = execute_aut2exe_compilation(&build_task, &settings_clone, &session_temp_clone).await;
-                let _ = app_handle_clone.emit("row-build-completed", result.clone());
-                result
-            }));
-        }
+        tasks.push(tokio::spawn(async move {
+            let _permit = sem_clone.acquire().await.unwrap();
+            let _ = app_handle_clone.emit("row-build-started", RowStartedPayload { row_id: build_task.row_id.clone() });
+            let result = execute_aut2exe_compilation(&build_task, &settings_clone, &session_temp_clone).await;
+            let _ = app_handle_clone.emit("row-build-completed", result.clone());
+            result
+        }));
     }
 
     let mut total_success = 0;
@@ -200,11 +174,11 @@ pub async fn compile_batch(
 }
 
 #[tauri::command]
-pub fn save_project_file(file_path: String, config: ProjectConfig) -> Result<(), String> {
-    file_manager::save_project_file(&file_path, &config)
+pub fn save_fardo_file(file_path: String, config: FardoConfig) -> Result<(), String> {
+    file_manager::save_fardo_file(&file_path, &config)
 }
 
 #[tauri::command]
-pub fn load_project_file(file_path: String) -> Result<ProjectConfig, String> {
-    file_manager::load_project_file(&file_path)
+pub fn load_fardo_file(file_path: String) -> Result<FardoConfig, String> {
+    file_manager::load_fardo_file(&file_path)
 }

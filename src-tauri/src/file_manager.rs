@@ -1,4 +1,4 @@
-use crate::models::ProjectConfig;
+use crate::models::{ProjectConfig, FardoConfig};
 use std::fs;
 
 pub fn save_project_file(path: &str, config: &ProjectConfig) -> Result<(), String> {
@@ -13,6 +13,20 @@ pub fn load_project_file(path: &str) -> Result<ProjectConfig, String> {
         .map_err(|e| format!("Failed reading file: {}", e))?;
     serde_json::from_str(&content)
         .map_err(|e| format!("Invalid project file format: {}", e))
+}
+
+pub fn save_fardo_file(path: &str, config: &FardoConfig) -> Result<(), String> {
+    let json_data = serde_json::to_string_pretty(config)
+        .map_err(|e| format!("Serialization error: {}", e))?;
+    fs::write(path, json_data)
+        .map_err(|e| format!("Failed to write file to disk: {}", e))
+}
+
+pub fn load_fardo_file(path: &str) -> Result<FardoConfig, String> {
+    let content = fs::read_to_string(path)
+        .map_err(|e| format!("Failed reading file: {}", e))?;
+    serde_json::from_str(&content)
+        .map_err(|e| format!("Invalid fardo file format: {}", e))
 }
 
 use include_dir::{include_dir, Dir};
