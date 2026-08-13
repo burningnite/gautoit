@@ -15,6 +15,10 @@ export default {
           700: '#035388',
           900: '#072d4a',
         }
+      },
+      fontFamily: {
+        sans: ['"Agave Nerd Font Mono"', 'monospace'],
+        mono: ['"Agave Nerd Font Mono"', 'monospace'],
       }
     },
   },

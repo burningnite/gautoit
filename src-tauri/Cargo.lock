@@ -3460,7 +3460,7 @@ dependencies = [
 
 [[package]]
 name = "taurito"
-version = "1.1.0"
+version = "1.7.0"
 dependencies = [
  "csv",
  "handlebars",

@@ -18,6 +18,8 @@ impl TemplateEngine {
         let mut hb = Handlebars::new();
         // Prevent HTML escaping so Windows path backslashes aren't mangled
         hb.register_escape_fn(handlebars::no_escape);
+        hb.register_helper("strip_spaces", Box::new(strip_spaces_helper));
+
         Self { hb }
     }
 
@@ -139,7 +141,8 @@ impl TemplateEngine {
                             let default_id = format!("{}-{}-{}", pc.id, platform_name, game);
                             let filename = self.generate_output_filename(pattern, &values, &default_id);
                             
-                            let output_exe_path = outputs_dir.join(&filename).to_string_lossy().to_string();
+                            let platform_dir = outputs_dir.join(platform_name);
+                            let output_exe_path = platform_dir.join(&filename).to_string_lossy().to_string();
 
                             let task_row_id = if blocks.len() > 1 {
                                 format!("{}_{}_{}_b{}", pc.id, platform_name, game, block_idx + 1)
@@ -177,4 +180,16 @@ fn normalize_map(row_values: &HashMap<String, String>) -> HashMap<String, String
         }
     }
     normalized
+}
+
+fn strip_spaces_helper(
+    h: &handlebars::Helper,
+    _: &Handlebars,
+    _: &handlebars::Context,
+    _: &mut handlebars::RenderContext,
+    out: &mut dyn handlebars::Output
+) -> handlebars::HelperResult {
+    let param = h.param(0).and_then(|v| v.value().as_str()).unwrap_or("");
+    out.write(&param.replace(" ", "_"))?;
+    Ok(())
 }

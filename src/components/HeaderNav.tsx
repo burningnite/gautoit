@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useProjectStore } from '../store/useProjectStore';
+import { open } from '@tauri-apps/plugin-dialog';
 import { useBuildStore } from '../store/useBuildStore';
 import { compileBatch } from '../utils/tauriCommands';
 import { SettingsModal } from './SettingsModal';
@@ -17,10 +18,10 @@ import {
   Layers
 } from 'lucide-react';
 
-import { autoSaveFardo } from '../utils/tauriCommands';
+import { autoSaveFardo, loadFardo } from '../utils/tauriCommands';
 
 export const HeaderNav: React.FC = () => {
-  const { projectName, setProjectName, getProjectConfig, compilerSettings } = useProjectStore();
+  const { projectName, setProjectName, getProjectConfig, loadProject, compilerSettings } = useProjectStore();
   const { isBuilding, initBatch, setActiveTab, activeTab, addLog, setSummary } = useBuildStore();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isPlatformsOpen, setIsPlatformsOpen] = useState(false);
@@ -37,6 +38,22 @@ export const HeaderNav: React.FC = () => {
       addLog('error', `Failed saving project: ${err?.message || err}`);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleLoadFardo = async () => {
+    try {
+      const selected = await open({
+        filters: [{ name: 'Fardo Project', extensions: ['fardo'] }],
+        multiple: false,
+      });
+      if (selected && typeof selected === 'string') {
+        const loadedConfig = await loadFardo(selected);
+        loadProject(loadedConfig);
+        addLog('success', `📂 Loaded project: ${selected}`);
+      }
+    } catch (err: any) {
+      addLog('error', `Failed to load .fardo file: ${err?.message || err}`);
     }
   };
 
@@ -71,8 +88,8 @@ export const HeaderNav: React.FC = () => {
         {/* Left section: App Brand & Project Title */}
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg text-white shadow-md">
-            <Cpu className="w-6 h-6 animate-pulse" />
-            <span className="font-bold text-sm tracking-wider uppercase">Taurito Factory</span>
+            <span className="text-xl animate-pulse">&#xeef1;</span>
+            <span className="font-bold text-sm tracking-wider uppercase">TAURITO</span>
           </div>
 
           <div className="h-6 w-px bg-slate-800" />
@@ -120,6 +137,15 @@ export const HeaderNav: React.FC = () => {
 
         {/* Right section: Action Buttons & Compile Launcher */}
         <div className="flex items-center space-x-3">
+          <button
+            onClick={handleLoadFardo}
+            className="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition border border-slate-700"
+            title="Load .fardo project file"
+          >
+            <FolderOpen className="w-4 h-4 text-amber-400" />
+            <span>Load .fardo</span>
+          </button>
+
           <button
             onClick={handleQuickSave}
             disabled={isSaving}

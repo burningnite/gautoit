@@ -2,13 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'Agave Nerd Font Mono';
+  src: url('./assets/fonts/AgaveNerdFontMono-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Agave Nerd Font Mono';
+  src: url('./assets/fonts/AgaveNerdFontMono-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+
 @layer base {
+  * {
+    font-family: 'Agave Nerd Font Mono', monospace !important;
+  }
+
   body {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Agave Nerd Font Mono', monospace !important;
   }
   
   code, pre {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Agave Nerd Font Mono', monospace !important;
   }
 }
 
@@ -39,7 +57,7 @@
   --ag-row-hover-color: #1e293b;
   --ag-selected-row-background-color: #1e3a8a;
   --ag-border-color: #334155;
-  --ag-font-family: 'Inter', sans-serif;
+  --ag-font-family: 'Agave Nerd Font Mono', monospace;
   --ag-font-size: 13px;
   --ag-grid-size: 6px;
 }
