@@ -33,4 +33,5 @@ outputs/
 script-guide/
 ea-scripts/
 *.aiproj
+*.fardo
 *.csv
