@@ -87,8 +87,8 @@ export const HeaderNav: React.FC = () => {
       <header className="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between shadow-lg select-none">
         {/* Left section: App Brand & Project Title */}
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg text-white shadow-md">
-            <span className="text-xl animate-pulse">&#xeef1;</span>
+          <div className="flex items-center space-x-2 bg-gradient-to-r from-emerald-600 to-teal-600 p-2 rounded-lg text-white shadow-md">
+            <span className="text-6xl animate-pulse">&#xeef1;</span>
             <span className="font-bold text-sm tracking-wider uppercase">TAURITO</span>
           </div>
 
@@ -99,7 +99,7 @@ export const HeaderNav: React.FC = () => {
               type="text"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
-              className="bg-slate-950/50 hover:bg-slate-950 focus:bg-slate-950 border border-slate-700/50 focus:border-blue-500 rounded px-2.5 py-1 text-sm font-medium text-slate-200 outline-none transition w-64"
+              className="bg-slate-950/50 hover:bg-slate-950 focus:bg-slate-950 border border-slate-700/50 focus:border-emerald-500 rounded px-2.5 py-1 text-sm font-medium text-slate-200 outline-none transition w-64"
               placeholder="Project Name..."
             />
             <span className="bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded border border-slate-700">
@@ -114,7 +114,7 @@ export const HeaderNav: React.FC = () => {
             onClick={() => setActiveTab('grid')}
             className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-xs font-medium transition ${
               activeTab === 'grid'
-                ? 'bg-blue-600 text-white shadow'
+                ? 'bg-emerald-600 text-white shadow'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -126,7 +126,7 @@ export const HeaderNav: React.FC = () => {
             onClick={() => setActiveTab('logs')}
             className={`flex items-center space-x-2 px-3 py-1.5 rounded-md text-xs font-medium transition ${
               activeTab === 'logs'
-                ? 'bg-blue-600 text-white shadow'
+                ? 'bg-emerald-600 text-white shadow'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >

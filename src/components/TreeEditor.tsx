@@ -17,7 +17,7 @@ export const TreeEditor: React.FC = () => {
       {/* Global Header & Settings */}
       <div className="flex justify-between items-center mb-8 border-b border-slate-800 pb-4">
         <div>
-          <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
+          <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-teal-400">
             Taurito Deployment Tree
           </h2>
           <p className="text-sm text-slate-500 mt-1">Manage hierarchical multi-platform configurations</p>
@@ -35,7 +35,7 @@ export const TreeEditor: React.FC = () => {
           </div>
           <button 
             onClick={addPC} 
-            className="px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 rounded-lg text-sm text-white font-semibold shadow-lg shadow-blue-900/20 transition-all active:scale-95"
+            className="px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 rounded-lg text-sm text-white font-semibold shadow-lg shadow-emerald-900/20 transition-all active:scale-95"
           >
             + Add PC Node
           </button>
@@ -67,7 +67,7 @@ export const TreeEditor: React.FC = () => {
                     type="checkbox" 
                     checked={pc.enabled} 
                     onChange={(e) => togglePCEnabled(pc.id, e.target.checked)}
-                    className="w-5 h-5 rounded border-slate-600 bg-slate-700 text-blue-500 focus:ring-blue-500 focus:ring-offset-slate-900 cursor-pointer"
+                    className="w-5 h-5 rounded border-slate-600 bg-slate-700 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-900 cursor-pointer"
                   />
                   <div className="flex items-center gap-2">
                     <span className="text-slate-400 font-medium uppercase text-xs tracking-wider">PC ID</span>
@@ -75,7 +75,7 @@ export const TreeEditor: React.FC = () => {
                       type="text"
                       value={pc.id}
                       onChange={(e) => updatePC(pc.id, { id: e.target.value })}
-                      className="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-sm font-bold text-blue-400 w-16 focus:border-blue-500 outline-none"
+                      className="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-sm font-bold text-emerald-400 w-16 focus:border-emerald-500 outline-none"
                     />
                   </div>
                 </div>
@@ -87,7 +87,7 @@ export const TreeEditor: React.FC = () => {
                       type="number"
                       value={pc.shortwait}
                       onChange={(e) => updatePC(pc.id, { shortwait: parseFloat(e.target.value) || 0 })}
-                      className="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-sm text-slate-200 w-16 focus:border-blue-500 outline-none"
+                      className="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-sm text-slate-200 w-16 focus:border-emerald-500 outline-none"
                     />
                   </div>
                   <div className="flex items-center gap-2">
@@ -96,7 +96,7 @@ export const TreeEditor: React.FC = () => {
                       type="number"
                       value={pc.prepasswait}
                       onChange={(e) => updatePC(pc.id, { prepasswait: parseFloat(e.target.value) || 0 })}
-                      className="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-sm text-slate-200 w-16 focus:border-blue-500 outline-none"
+                      className="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-sm text-slate-200 w-16 focus:border-emerald-500 outline-none"
                     />
                   </div>
                   <div className="w-px h-6 bg-slate-700"></div>
@@ -119,7 +119,7 @@ export const TreeEditor: React.FC = () => {
                     return (
                       <div key={platformId} className="bg-slate-950/50 rounded-lg p-4 border border-slate-800/60 shadow-sm relative overflow-hidden">
                         {/* Subtle background gradient for platform */}
-                        <div className={`absolute top-0 left-0 w-1 h-full ${platformId === 'epic' ? 'bg-blue-500' : 'bg-red-500'}`}></div>
+                        <div className={`absolute top-0 left-0 w-1 h-full ${platformId === 'epic' ? 'bg-emerald-500' : 'bg-teal-500'}`}></div>
                         
                         <div className="flex justify-between items-center mb-4 pl-2">
                           <h4 className="text-sm font-bold text-slate-300 uppercase tracking-wider">{platformId} PLATFORM</h4>
@@ -133,7 +133,7 @@ export const TreeEditor: React.FC = () => {
                               value={account.user}
                               placeholder={`Enter ${platformId} user...`}
                               onChange={(e) => updatePCAccount(pc.id, platformId, { ...account, user: e.target.value })}
-                              className="bg-slate-900 border border-slate-700 rounded-md px-3 py-1.5 text-sm text-slate-200 focus:border-blue-500 focus:bg-slate-800 outline-none transition-colors w-full"
+                              className="bg-slate-900 border border-slate-700 rounded-md px-3 py-1.5 text-sm text-slate-200 focus:border-emerald-500 focus:bg-slate-800 outline-none transition-colors w-full"
                             />
                           </div>
                           
@@ -144,7 +144,7 @@ export const TreeEditor: React.FC = () => {
                               value={account.password || ''}
                               placeholder="Enter password..."
                               onChange={(e) => updatePCAccount(pc.id, platformId, { ...account, password: e.target.value })}
-                              className="bg-slate-900 border border-slate-700 rounded-md px-3 py-1.5 text-sm text-slate-200 focus:border-blue-500 focus:bg-slate-800 outline-none transition-colors w-full"
+                              className="bg-slate-900 border border-slate-700 rounded-md px-3 py-1.5 text-sm text-slate-200 focus:border-emerald-500 focus:bg-slate-800 outline-none transition-colors w-full"
                             />
                           </div>
 
@@ -158,7 +158,7 @@ export const TreeEditor: React.FC = () => {
                                     key={game} 
                                     className={`flex items-center gap-2 p-2 rounded-md cursor-pointer border transition-colors ${
                                       isEnabled 
-                                        ? 'bg-blue-500/10 border-blue-500/30 text-blue-100 hover:bg-blue-500/20' 
+                                        ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-100 hover:bg-emerald-500/20' 
                                         : 'bg-slate-900 border-slate-800 text-slate-500 hover:bg-slate-800'
                                     }`}
                                   >
@@ -168,7 +168,7 @@ export const TreeEditor: React.FC = () => {
                                       onChange={(e) => togglePCGame(pc.id, game, e.target.checked)}
                                       className="hidden" // Hidden native checkbox, styled parent handles visual
                                     />
-                                    <div className={`w-3 h-3 rounded-sm flex items-center justify-center ${isEnabled ? 'bg-blue-500' : 'bg-slate-700'}`}>
+                                    <div className={`w-3 h-3 rounded-sm flex items-center justify-center ${isEnabled ? 'bg-emerald-500' : 'bg-slate-700'}`}>
                                       {isEnabled && <Check className="w-2.5 h-2.5 text-white" />}
                                     </div>
                                     <span className="text-xs font-medium truncate" title={game}>{game}</span>
